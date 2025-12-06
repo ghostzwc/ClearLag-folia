@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.example"
-version = "1.0"
+version = "1.1"
 
 repositories {
     // 添加阿里云Maven镜像
@@ -50,6 +50,6 @@ java {
 
 tasks {
     jar {
-        archiveFileName.set("ClearLag1.0.jar")
+        archiveFileName.set("ClearLag1.1.jar")
     }
 }

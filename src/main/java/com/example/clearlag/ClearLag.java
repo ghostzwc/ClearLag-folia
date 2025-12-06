@@ -261,12 +261,16 @@ public class ClearLag extends JavaPlugin {
         String message = warningMessage.replace("{seconds}", String.valueOf(seconds));
         message = message.replace('&', '§');
         
-        Bukkit.broadcastMessage(message);
-        
-        // 如果启用了警告音效
-        if (warningSoundEnabled) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.playSound(player.getLocation(), warningSound, 1.0f, 1.0f);
+        // 遍历所有玩家发送消息和音效
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            // 发送消息（线程安全）
+            player.sendMessage(message);
+            
+            // 如果启用了警告音效，在玩家所在的区域线程中播放
+            if (warningSoundEnabled) {
+                Bukkit.getRegionScheduler().execute(this, player.getLocation(), () -> {
+                    player.playSound(player.getLocation(), warningSound, 1.0f, 1.0f);
+                });
             }
         }
     }
@@ -353,7 +357,12 @@ public class ClearLag extends JavaPlugin {
                         // 确保替换所有占位符
                         message = message.replace("{drops}", String.valueOf(dropsCleared.get()))
                                         .replace("{entities}", String.valueOf(entitiesCleared.get()));
-                        Bukkit.broadcastMessage(message.replace('&', '§'));
+                        message = message.replace('&', '§');
+                        
+                        // 遍历所有玩家发送消息
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            player.sendMessage(message);
+                        }
                         
                         // 更新下一次清理时间（基于配置文件中的清理间隔）
                         nextClearTime = System.currentTimeMillis() + (clearInterval * 1000);
